@@ -1,0 +1,39 @@
+#!/bin/bash
+
+dir=$1
+old=$2
+new=$3
+
+if [ -z "$dir" ]
+then
+    echo "tools/refactorize DIR OLD_STRING NEW_STRING"
+    exit 1
+fi
+
+function replace_in() {
+    # rename files
+    find "$1" -type f -name "*$old*" | while read path
+    do
+	newbasename=` basename "$path" | sed "s~$old~$new~g" `
+	echo mv "$path" ` dirname "$path"`/"$newbasename"	
+        mv "$path" ` dirname "$path"`/"$newbasename"
+    done
+
+    # rename directories (can't rename dirs together with files
+    # - a file path wouldn't exist after renaming a dir)
+    find "$1" -type d -name "*$old*" | while read path
+    do
+	newpath=` echo "$path" | sed "s~$old~$new~g" `
+	echo mv "$path" "$newpath"	
+	mv "$path" "$newpath"
+    done
+
+    # rename in files
+    find "$1" -type f  | while read path
+    do
+    	echo sed "s~$old~$new~g" -i "$path"
+	sed "s~$old~$new~g" -i "$path"
+    done
+}
+
+replace_in "$dir"

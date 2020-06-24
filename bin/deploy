@@ -1,0 +1,119 @@
+#!/usr/local/bin/bashible
+
+result do_github false
+result do_assets false
+result do_migrate false
+result do_check false
+
+set +u
+while [ -n "$1" ]; do
+  case "$1" in
+    --assets|-a)
+      result do_assets true
+      ;;
+    --migrate|-m)
+      result do_migrate true
+      ;;
+    --check|-c)
+      result do_check true
+      ;;
+    --github|-g)
+      result do_github true
+      ;;
+    --full|-f)
+      result do_assets true
+      result do_migrate true
+      result do_check true
+      result do_github true
+      ;;
+    --help|-h)
+      echo "-a | --assets"
+      echo "-m | --migrate"
+      echo "-c | --check"
+      echo "-g | --github"
+      echo "-f | --full"
+      exit
+      ;;
+  esac
+  shift
+done
+set -u
+
+
+@ Prerequisities
+  - not empty echo "$RSH"
+
+@ Precompiling assets and checking the app
+  # precompiled are top assets, not export/assets !!!
+  - when do_assets
+  - cd ..
+  - rm -rf public/assets/*
+  - evaluate 'bundle exec rake precompile_assets | bin/logview'
+
+@ Syncing to ./export
+  - cd ..
+  - rsync -av --relative --delete \
+	apps/ \
+	assets/ \
+	bin/logview \
+	bin/rake \
+	bin/start \
+	lib \
+	locales \
+	migrate \
+	models \
+	public \
+	rack \
+	roda \
+	sequel \
+	service \
+	tasks \
+	views \
+	Gemfile* \
+	Rakefile \
+	app.rb \
+	base.rb \
+	config.ru \
+	db.rb \
+	env-production.sh \
+	env.rb \
+	logger.rb \
+	models.rb \
+	precompiled_assets.json \
+	./export/
+
+@ Creating symlinks
+  - cd ../export
+  - may_fail ln -s ../data
+  - may_fail ln -s ../tmp
+
+@ Checking export
+  - when do_check
+  - cd ../export
+  - evaluate 'bundle exec rake export_check | bin/logview'
+
+@ Github
+  - when do_github
+  - cd ..
+  - rsync -av public/web/ github/babisomat/public/web/ --exclude=.git --exclude=README.md --delete
+  - cd github/babisomat
+  - git add -A
+  - git commit -m changes
+  - git push
+
+@ Syncing data to remote
+  - cd ..
+  - rsync -av --rsh="$RSH" ./export/ :~/export/ --delete-after --exclude=supervise --exclude=puma.pid
+
+@ Migrating remote db
+  - when do_migrate
+  # bundle exec fails for the first time after rsyncing Gemfile.lock, therefore rake -T is executed for the first time
+  - $RSH <<< "cd export && source ./env-production.sh && bundle exec rake -T; bundle exec rake prod_up;"
+
+@ Restarting app service
+  - $RSH <<< "cd export && source ./env-production.sh && sv restart ./service/app"
+
+@ Purge
+  - $RSH <<< "sudo /usr/local/bin/purge_babisomatcz_cache"
+
+run ./log

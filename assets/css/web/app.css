@@ -1,0 +1,32 @@
+body{
+margin:1em auto;
+max-width:40em;
+padding:0 .62em;
+font:1.2em/1.62 Roboto Slab, sans-serif;
+}
+h1,h2,h3 {
+line-height:1.2;
+}
+h1 {text-align:center; font-weight:bold; font-size:2.8em; font-family:Roboto Slab;}
+span.new {background: url("/public/web/new.png") no-repeat; background-size: cover; width: 30px; height:30px; margin-top: -10px; display: inline-block;}
+#chapters ul {float:left}
+#chapters li {font-size:1.2em;list-style:none;margin:0}
+#chapters a {padding-left:50px;display:inline-block;min-width:30px;min-height:30px;background:url(/public/web/speakeroff.png) no-repeat; background-size: 30px 30px;}
+#chapters .active {background:url(/public/web/speakeron.png) no-repeat; background-size: 30px 30px;}
+
+#controls ul {float:right;padding-right:10px}
+#controls li {font-size:1.2em;list-style:none;margin:0}
+#controls a {padding-left:50px;display:inline-block;min-width:45px;min-height:34px;background:url(/public/web/switchoff.png) no-repeat; background-size: 45px 30px;}
+#controls .active {background:url(/public/web/switchon.png) no-repeat; background-size: 45px 30px;}
+#video {position:relative;}
+#video #tv {width:100%;margin-bottom:15px; background-color:black;}
+#video #playbutton {position:absolute; top:30%; left:40%; width:100px;}
+#video #playbutton {width:6em;}
+.grayscale {filter: grayscale(100%);}
+
+footer #share {margin:auto;width:110px;padding-top:15px;text-align:center;color:#999999}
+footer #share a {display: inline-block;}
+footer #share a img {width:50px;}
+
+footer #creds {border-top: solid #eeeeee 5px;margin-top:20px;color:#999999}
+footer #creds a {padding-right:10px;color:transparent}

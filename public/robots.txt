@@ -1,0 +1,3 @@
+# allowed to load cards
+#User-agent: *
+#Disallow: /

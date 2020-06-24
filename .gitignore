@@ -1,0 +1,12 @@
+audio
+.sass-cache
+public/assets
+data/upload/*
+data/*.sqlite
+data/session_secret
+export/*
+tmp/*
+precompiled_assets.json
+Gemfile
+Gemfile.lock
+puma.pid

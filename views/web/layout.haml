@@ -1,0 +1,25 @@
+%html{:lang => "en"}
+  %head
+    %meta(name='viewport' content='width=device-width, initial-scale=1')
+  
+    %meta{:property=>"og:url", :content=>@url_host}
+    %meta{:property=>"og:description", :content=>''}
+    %meta{:property=>"og:type", :content=>'article'}
+    %meta{:property=>"og:title", :content=>'Babišomat'}
+    %meta{:property=>"og:image", :content=> "#{@url_host}/public/web/og.jpg"}
+    %meta{:property=>"og:image:width", :content=>'600'}
+    %meta{:property=>"og:image:height", :content=>'400'}
+    %meta{:property=>"og:site_name", :content=>'Babišomat'}
+
+    %meta{:property=>"twitter:title", :content=>'Babišomat'}
+    %meta{:property=>"twitter:description", :content=>''}
+    %meta{:property=>"twitter:creator", :content=>''}
+    %meta{:property=>"twitter:image", :content=> "#{@url_host}/public/web/og.jpg"}
+    
+    %title Babišomat
+    = assets([:css, :web])
+    = assets([:js, :web])
+      
+  %body= yield
+
+  %link(href="https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap" rel="stylesheet")

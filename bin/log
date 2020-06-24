@@ -1,0 +1,5 @@
+#!/usr/local/bin/bashible
+
+@ Tailing log
+  - cd ..
+  - $RSH <<< "cd export && tail -f /var/log/www-babisomatcz" | ./bin/logview

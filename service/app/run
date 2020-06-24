@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# symlink me!
+
+exec 2>&1
+
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+real=`realpath $0` || exit 1
+cd `dirname "$real"`/../.. || exit 1
+
+source env-production.sh || exit 1
+
+exec chpst -u $APP_USER -U $APP_USER env HOME=$APP_HOME /bin/bash -l -c 'exec bin/start'  # bash used to load .bash_profile -> RVM set default ruby

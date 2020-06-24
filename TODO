@@ -1,0 +1,251 @@
+// preload images: chapter i toggle na zacatku pred spustenim (ale ty tvsety, ktere budou zobrazeny);
+// v prubehu nastavit tvset (nebo nize podle videa) a preloadovat images v dobe nacitani audia
+
+// chapter
+//   starter video 0
+//     tvset 0
+//   kolekce videi 1 (vcetne b) napr. divadlo kratky potlesk - divacka
+//     tvset 1
+//     tvset 2
+//   kolekce videi 2 (vcetne b) napr. divadlo dlouhy potlesk
+//     tvset 3
+//     tvset 4
+// 
+// changeTV rozdelit na changeTVpre() a changeTVdoit()
+    
+// nez TVSet by bylo lepsi mit cele skupiny zvuky-tvpics (kratky potlesk=divacka, dlouhy potlesk=divadlo);
+// ale tyka se jen spice, nema smysl u babise
+// -> ale zachovat jednu uroven [sound], takze spis mit vic aplaus-0, aplaus-1, atd. a pak z toho nahodne zvolit
+// a zrusit tu hierarchii tv/TVSet (namisto TVSetu budou ta cisla)
+// a funkce getSpice() ktera vrati random spice podle 'aplaus' (mozna hledat regexem maximum?)
+// specialni aplaus-0 bude startovaci (pokud je)
+
+// zrusit bsources:
+//   pri startu zobrazi chapter-XYZ-0
+//   pokracuje BAudio chapter-XYZ-b-0
+//   a normalnim chapter-XYZ-1 .. 2 .. 3 ..
+//   a BAudio chapter-XYZ-b-0 .. 1 .. 2 ..
+//   spice prvni zobrazeni spice-0
+//   dalsi spice-1 .. 2 .. 3 ..
+//  Kazdy obsahuje vlastni tvset
+
+// zvuky se deli do skupin
+//   a) chapter (chapter-epr_paj)
+//   b) spice (alzbeta)
+// chapter musi zacinat "chapter-" protoze se to regexem odstranuje, kdyz se voli random spice
+// kazdy chapter/spice zacina baudio, je-li nejake; specialni baudio je b/0.ogg, ktere je prehrano jen jednou pri zapnuti chaptu/spice
+//   pote je selectovano 1.ogg-max.ogg
+// baudio se prehrava po skonceni spice
+// na zacatku chapteru se prehraje 0.ogg a ihned pote jedno baudio
+manipulovat s URL (history); nutno nekde ale nastavit cesty
+
+nastavovat og image podle toho co je aktivni
+https://babisomat.cz/svedska-trojka-ovm
+
+---
+
+cele sety videi, z nichz bude bran random - napriklad tiskovka vlady (chapter-tiskovka-1 == schillerova, chapter-tiskovka-2 == babis)
+kazda ma vlastni queue
+
+chapter je tiskovka a subchapter je 0-x
+
+kazda subchapter ma svuj tvset
+
+subchaptery a spice jsou skoro totez, stridaji se navzajem s overlappem
+
+=> getItem bude brat ruzne source queues (sestavuje playlist)
+
+
+json:
+
+chapters = {chapter=>[ [num_vids, num_tvsets], [num_vids, num_tvsets], ... ]}
+loops = {chapter=>2}
+
+---
+
+
+program loops:
+
+  chapter-miliony = [
+    'start', 1, ... - jen pri startu
+    'seq', snddir xy, num_normal, num_bdir, tvsrc [xxx, yyy], audioloop src 
+    'random', 3, snddir 1, tvsrc [bab/1, bab/1, bab/1]
+    ]
+    
+  alzbeta = [
+    'random', 1, snddir ...
+  ]
+  
+  => podle toho funguje getItem (inicializuje shuffle queue, atd.)
+  => take spice muze sestavat z vice audio
+  => chapter a spice jsou skoro totez, stridaji se navzajem s overlappem
+
+
+  playNext = function(delay) {
+    getAudio( function(a) {
+      a.attachEvent('timeupdate', function() {
+        if (a.currentTime>a.duration/2 || a.duration<2000) {
+          playNext(a.duration-a.currentTime);
+        }
+      });
+      if (delay==0)
+        a.play();
+      else
+        setTimeout(a.play, delay);
+    }
+  playNext();
+
+
+
+
+
+  function preloadAudios(sound, init) {
+    if (init) audios[sound] = [];
+       
+    var loader = function() {
+      if (audios[sound].length<2) {
+        var audio = new Audio(getItem(sound));
+        audios[sound].push(audio);
+        audio.attachEvent('timeupdate', function() { 
+          if (audio.currentTime>audio.duration/2) loader();
+        })
+        audio.load();
+      }
+    
+    }
+    
+
+
+
+if (Math.random()<=0.2) {
+  
+  var aplaus = getNextAudio('aplaus');
+  add = aplaus.duration*1000-800;
+  setTimeout(function() { aplaus.play() }, audio.duration*1000-400);
+  }
+  
+  else if (Math.random()<=0.5) {
+  var aplaus = getNextAudio('alzbeta');
+  add = aplaus.duration*1000-800;
+  setTimeout(function() { aplaus.play() }, audio.duration*1000-400);
+  }
+
+
+  function getAplaus() {
+  var audio;
+  while (aplaus.length<2) {
+  audio = new Audio('/public/audio-generated/smich.mp3');
+  audios.push(audio);
+    
+  //setTimeout( function() { audio.load() }, 1);
+  audio.load();
+  }
+  return aplaus.shift();
+  }
+
+  a = new Audio('/public/audio-generated/x-sliby-aplaus.ogg');
+  a.play();
+  b = new Audio('/public/audio-generated/x-sliby.ogg');
+  b.play();
+
+  alert('start');
+  var url = '/public/babis-generated/';
+  var getSrc = function() { return url + (Math.floor( new Date().getTime() / 1000 / 60 / 15) ) + ".ogg"; }
+  var audio = new Audio(getSrc());
+  audio.onended = function() {
+  audio.src = getSrc();
+  audio.play();
+  }
+  audio.play();
+
+
+# jak udelat loop pro dalsi zvuky? asi parametr loop
+
+# onended hook aplaus
+
+# vice hooks, aby mohlo vice reagovat
+
+
+  audio.onended = function() {
+  console.log("END");
+  audio.currentTime=0;
+  audio2.play();
+  }
+
+    audio2.onended = function() {
+  console.log("END2");
+  audio2.currentTime=0;
+  audio.play();
+  }
+
+
+  function newPreload() {
+  if (playlist.length==0) newPlaylist();
+  i = playlist.pop();
+  var newPath = babis.src.match(/.*\//) + i + '.ogg';;
+  if (!audio[i]) audio[i] = new Audio(newPath);
+  preload = audio[i];
+  preload.load();
+
+  preload.buffered;
+  //var bufferedTimeRanges = preload.buffered;
+  //alert(bufferedTimeRanges);
+  //alert(preload.duration);
+  //preload.play();
+  //preload.pause();
+  
+  console.log('new preload: ' + preload.src);
+  }
+  
+  function startPlay() {
+  babis = new Audio("/public/audio/cau.ogg"); 
+  newPlaylist();
+  newPreload();
+  
+  ended = function() { 
+  if (tout) clearTimeout(tout);
+  tout = null;
+  console.log('ended: ' + babis.src );  
+  babis.src = preload.src;
+  babis.play();
+  console.log('started: ' + babis.src);
+  newPreload();
+  cnt++;
+  }
+  
+  //babis.addEventListener("ended", ended, false);  
+  
+  babis.addEventListener('timeupdate', function() {
+  var duration =  babis.duration;
+  //alert(duration);
+  if (duration>0 && !tout) tout = setTimeout(ended, preload.duration*1000-300);
+  });
+  
+  
+  babis.play();
+  }
+
+
+  function aplaus() {
+  var audio = document.querySelector('#aplaus');
+  if (bg['aplaus']) {
+  bg['aplaus'] = nil;
+  finishHooks['aplaus'] = nil;
+  else {
+  bg['aplaus'] = true;
+  finishHooks['aplaus'] = function() {
+  if (cnt%Math.rand(10)==0)
+  audio.src = random
+  audio.play;
+  }
+  }
+  
+  
+  babis = new Audio();
+  babis.seekable;
+  
+  playlist  start..duration
+  onplaystart setInterval duration
+  
+  to by se ale nepreloadovalo dobre, takze spis delat setInterval misto onended
+  

@@ -1,2 +1,1 @@
-# babisomat
 babisomat.cz sources

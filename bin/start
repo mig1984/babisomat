@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# these are all environment variables used by the app
+export HOST
+export PORT
+export ENVIRONMENT
+
+echo "$0: ENVIRONMENT=$ENVIRONMENT, HOST=$HOST, PORT=$PORT"
+
+program() {
+  if [ "$ENVIRONMENT" = development ]; then
+     exec bundle exec puma --pidfile puma.pid -e development -b tcp://$HOST:$PORT config.ru
+  elif [ "$ENVIRONMENT" = production ]; then
+     exec bundle exec puma --pidfile puma.pid -t 10 -w 2 -e production -b tcp://$HOST:$PORT config.ru
+  fi
+}
+
+# on term run via logview
+if test -t 1; then
+  program | /bin/bash bin/logview
+else
+  program
+fi
+
+echo "EXIT??? !!!"

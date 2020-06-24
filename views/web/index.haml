@@ -1,0 +1,66 @@
+%script
+  window.onload = function() {
+  defaultChapter = "chapter-#{@chapter}";
+  URL_AUDIO = ''; // 'https://mig1984.github.io/babisomat';
+  URL_TV = '';
+  sources = #{@sources};
+  bsources = #{@bsources}; 
+  tvpics  = #{@tvpics};
+  loops = #{@loops};
+  init();
+  = @toggle.each do |x|
+    toggle('#{x}', true);  
+  }
+
+%header
+  %h1 BABIŠOMAT
+
+%main
+  .wrapper
+    #video
+      %a{:onclick=>'togglePlay()'}
+        %img{id: 'tv', class: 'grayscale', src: '/public/web/stretch.jpg' }
+        %img{id: 'playbutton', src: '/public/web/playbutton.png'}
+    #chapters
+      %ul
+        %li
+          %a#chapter-ovm{onclick: "loadChapter('chapter-ovm')"} 
+            Švédská trojka OVM
+            %span.new
+        %li
+          %a#chapter-uvolnovani{onclick: "loadChapter('chapter-uvolnovani')"} 
+            Uvolňování rozvolňování
+        %li
+          %a#chapter-epr_paj{onclick: "loadChapter('chapter-epr_paj')"} 
+            Epr krambl páj
+
+    #controls
+      %ul
+        %li
+          %a#aplaus{onclick: "toggle('aplaus',true)"} Ovace
+        %li
+          %a#alzbeta{onclick: "toggle('alzbeta',true)"} Alžběta Šorfová
+        %li
+          %a#zeman{onclick: "toggle('zeman',true)"} Miloš Zeman
+        %li
+          %a#vesele{onclick: "toggle('vesele',true)"} Veselé příhody
+
+    %div{style: "clear:both"}
+    
+%footer
+  #share
+    %a{href: "https://www.facebook.com/share.php?u=#{u @self_url }&title=#{u 'Babišomat'}"}
+      %img{src: '/public/web/facebook.png'}
+    %a{href: "https://twitter.com/intent/tweet?status=#{u 'Babišomat'}"}
+      %img{src: '/public/web/twitter.png'}
+
+  #creds
+    %p 
+      Podporují:
+      %br
+      %a{href: 'https://www.hovinky.com'}
+        %img{src: '/public/web/hovinky.png'}
+      %a{href: 'https://takkdy.cz'}
+        %img{src: '/public/web/takkdy.png'}
+      %a{href: 'https://divadlorepublika.cz'}
+        %img{src: '/public/web/divadlorepublika.png', width: 153, height: 25}

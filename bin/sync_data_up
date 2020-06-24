@@ -1,0 +1,6 @@
+#!/usr/local/bin/bashible
+
+@ Syncing data to remote
+  - cd ..
+  - when 'empty echo "$RSH"' fail "RSH variable is empty"
+  - rsync -av --rsh="$RSH" ./data/ :~/data/ --delete-after
